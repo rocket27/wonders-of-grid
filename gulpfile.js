@@ -1,7 +1,9 @@
+const browserSync = require('browser-sync').create();
 const cleanCss = require('gulp-clean-css');
 const concat = require('gulp-concat');
 const del = require('del');
 const gulp = require('gulp');
+const imagemin = require('gulp-imagemin');
 const loadPlugin = require('gulp-load-plugins')();
 const pug = require('gulp-pug');
 const sassGlob = require('gulp-sass-glob');
@@ -14,13 +16,11 @@ const config = {
     sourcePath: './source',
 }
 
-gulp.task('clean', (callback) => {
-    return del(config.distPath, callback);
-});
+gulp.task('clean', callback => del(config.distPath, callback));
 
 gulp.task('fonts', () => {
-    gulp.src(`${config.sourcePath}/assets/fonts/**/*.*`)
-        .pipe(gulp.dest(config.distPath));
+    return gulp.src(`${config.sourcePath}/assets/fonts/**/*.*`)
+        .pipe(gulp.dest(`${config.distPath}/assets/fonts`));
 });
 
 gulp.task('images', () => {
@@ -28,12 +28,22 @@ gulp.task('images', () => {
         `${config.sourcePath}/assets/images/**/*.*`,
         { since: gulp.lastRun('images') },
     )
+        .pipe(imagemin([
+            imagemin.gifsicle({ interlaced: true }),
+            imagemin.jpegtran({ progressive: true} ),
+            imagemin.optipng({ optimizationLevel: 5 }),
+            imagemin.svgo({
+                plugins: [
+                    { removeViewBox: true },
+                    { cleanupIDs: false },
+                ],
+            }),
+        ]))
         .pipe(gulp.dest(`${config.distPath}/assets/images`))
-        // Todo: imagemin прикрутить
 });
 
 gulp.task('svgSprite', () => {
-    return gulp.src(`${config.sourcePath}/assets/svg/*.svg`)
+    return gulp.src(`${config.sourcePath}/assets/svg/**/*.svg`)
         .pipe(loadPlugin.svgmin({
             js2svg: {
                 pretty: true,
@@ -80,6 +90,7 @@ gulp.task('styles', () => {
         .pipe(cleanCss({ compatibility: 'ie8' }))
         .pipe(loadPlugin.sourcemaps.write())
         .pipe(gulp.dest(`${config.distPath}/css`))
+        .pipe(browserSync.stream());
 });
 
 gulp.task('pug', () => {
@@ -95,3 +106,45 @@ gulp.task('pug', () => {
         }))
         .pipe(gulp.dest(config.distPath));
 });
+
+gulp.task('watch', () => {
+    gulp.watch(`${config.sourcePath}/assets/images/**/*.*`, gulp.series('images'));
+    gulp.watch(`${config.sourcePath}/assets/svg/**/*.svg`, gulp.series('svgSprite'));
+    gulp.watch(`${config.sourcePath}/templates/**/*.pug`, gulp.series('pug'));
+    gulp.watch(`${config.sourcePath}/styles/**/*.scss`, gulp.series('styles'));
+    // gulp.watch('./source/js/**/*.js', $.gulp.series('js:process'));
+});
+
+gulp.task('serve', () => {
+    browserSync.init({
+        open: true,
+        server: config.distPath,
+    });
+
+    browserSync.watch([`${config.distPath}/**/*.*`, '!**/*.css'], browserSync.reload);
+});
+
+gulp.task('addVersions', () => {
+    return gulp.src(`${config.distPath}/*.html`)
+        .pipe(loadPlugin.replace(new RegExp('.js"', 'g'), '.js?v=' + new Date().getTime() + '"'))
+        .pipe(loadPlugin.replace(new RegExp('.css"', 'g'), '.css?v=' + new Date().getTime() + '"'))
+        .pipe(gulp.dest(config.distPath));
+})
+
+gulp.task('default', gulp.series('clean',
+    gulp.parallel(
+        'fonts',
+        'images',
+        'svgSprite',
+        'externalStyles',
+        'pug',
+        'styles',
+        // 'copy:json',
+        // 'js:foundation',
+        // 'js:process',
+    ),
+    gulp.parallel(
+        'watch',
+        'serve',
+    ),
+));
