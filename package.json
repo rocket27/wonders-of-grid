@@ -1,0 +1,29 @@
+{
+  "name": "wonders-of-grid",
+  "version": "1.0.0",
+  "description": "The wonders of CSS Grid Layout",
+  "main": "index.js",
+  "repository": "https://github.com/rocket27/wonders-of-grid.git",
+  "author": "Dmitry Kamenev <dmitry.kamenev.27@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "del": "^5.1.0",
+    "gulp": "^4.0.2",
+    "gulp-autoprefixer": "^7.0.1",
+    "gulp-cheerio": "^0.6.3",
+    "gulp-clean-css": "^4.2.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-load-plugins": "^2.0.1",
+    "gulp-notify": "^3.2.0",
+    "gulp-pug": "^4.0.1",
+    "gulp-replace": "^1.0.0",
+    "gulp-sass": "^4.0.2",
+    "gulp-sass-glob": "^1.1.0",
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-svg-sprite": "^1.5.0",
+    "gulp-svgmin": "^2.2.0"
+  },
+  "dependencies": {
+    "normalize.css": "^8.0.1"
+  }
+}
