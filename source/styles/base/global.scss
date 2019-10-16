@@ -1,0 +1,29 @@
+.main-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content-wrapper {
+  flex: 1 0 auto;
+}
+
+.content-block {
+  padding: 80px 0 60px;
+}
+
+.container {
+  max-width: 888px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.wide-container {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.footer {
+  flex: 0 0 auto;
+}

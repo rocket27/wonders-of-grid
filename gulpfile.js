@@ -158,7 +158,7 @@ gulp.task('watch', () => {
     gulp.watch(`${config.sourcePath}/assets/svg/**/*.svg`, gulp.series('svgSprite'));
     gulp.watch(`${config.sourcePath}/templates/**/*.pug`, gulp.series('pug'));
     gulp.watch(`${config.sourcePath}/styles/**/*.scss`, gulp.series('styles'));
-    gulp.watch(`${config.sourcePath}/js/**/*.js`, gulp.series('scripts'));
+    gulp.watch(`${config.sourcePath}/js/**/*.js`, gulp.series('scripts:serve'));
 });
 
 gulp.task('serve', () => {

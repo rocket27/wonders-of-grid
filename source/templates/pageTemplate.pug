@@ -17,8 +17,10 @@ html(lang="en")
         link(rel='stylesheet' href='css/external.css')
         link(rel='stylesheet' href='css/bundle.css')
 
-        //- script(src='js/external.js' defer)
         script(src='js/bundle.js' defer)
     body
-        //- include common/preloader
-        block content
+        div.main-wrapper
+            div.content-wrapper
+                block content
+            include ./modules/footer
+        

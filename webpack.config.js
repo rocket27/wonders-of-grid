@@ -6,24 +6,8 @@ module.exports = {
     },
     output: {
         filename: 'bundle.js',
-        // chunkFilename: '[name].[contenthash].bundle.js',
         path: path.resolve(__dirname, './dist'),
     },
-    // optimization: {
-    //     splitChunks: {
-    //         cacheGroups: {
-    //             vendor: {
-    //                 test: /node_modules/,
-    //                 chunks: "initial",
-    //                 name: "vendor",
-    //                 enforce: true
-    //             }
-    //         }
-    //     }
-    // },
-    // optimization: {
-    //     minimize: build,
-    // },
     module: {
         rules: [
             {
