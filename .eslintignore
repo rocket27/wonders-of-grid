@@ -1,0 +1,6 @@
+gulpfile.js
+webpack.config.js
+node_modules/**/*.*
+assets/**/*.*
+*.min.js
+dist/**/*.*

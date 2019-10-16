@@ -7,6 +7,9 @@ const imagemin = require('gulp-imagemin');
 const loadPlugin = require('gulp-load-plugins')();
 const pug = require('gulp-pug');
 const sassGlob = require('gulp-sass-glob');
+const webpack = require('webpack');
+const webpackStream = require('webpack-stream');
+const yargs = require('yargs');
 
 const config = {
     distPath: './dist',
@@ -14,6 +17,18 @@ const config = {
         './node_modules/normalize.css/normalize.css',
     ],
     sourcePath: './source',
+}
+
+const webpackConfig = require('./webpack.config.js');
+const argv = yargs.argv;
+const production = !!argv.production;
+
+const setMode = (env = production) => {
+    webpackConfig.mode = env ? 'production' : 'development';
+    webpackConfig.devtool = env ? false : 'source-map';
+    webpackConfig.optimization = {
+        minimize: env,
+    };
 }
 
 gulp.task('clean', callback => del(config.distPath, callback));
@@ -107,12 +122,43 @@ gulp.task('pug', () => {
         .pipe(gulp.dest(config.distPath));
 });
 
+gulp.task('js', () => {
+    return gulp.src(`${config.sourcePath}/js/**/*.js`)
+        .pipe(webpackStream(webpackConfig), webpack)
+        .pipe(gulp.dest(`${config.distPath}/js`))
+        .on('end', browserSync.reload);
+});
+
+gulp.task('eslint', () => {
+    return gulp.src(`${config.sourcePath}/js/**/*.js`)
+        .pipe(loadPlugin.eslint())
+        .pipe(loadPlugin.eslint.format());
+});
+
+gulp.task('scripts:serve', gulp.series(
+    callback => {
+        setMode();
+        callback();
+    },
+    'eslint',
+    'js',
+));
+
+gulp.task('scripts', gulp.series(
+    callback => {
+        setMode(true);
+        callback();
+    },
+    'eslint',
+    'js'),
+);
+
 gulp.task('watch', () => {
     gulp.watch(`${config.sourcePath}/assets/images/**/*.*`, gulp.series('images'));
     gulp.watch(`${config.sourcePath}/assets/svg/**/*.svg`, gulp.series('svgSprite'));
     gulp.watch(`${config.sourcePath}/templates/**/*.pug`, gulp.series('pug'));
     gulp.watch(`${config.sourcePath}/styles/**/*.scss`, gulp.series('styles'));
-    // gulp.watch('./source/js/**/*.js', $.gulp.series('js:process'));
+    gulp.watch(`${config.sourcePath}/js/**/*.js`, gulp.series('scripts'));
 });
 
 gulp.task('serve', () => {
@@ -131,7 +177,7 @@ gulp.task('addVersions', () => {
         .pipe(gulp.dest(config.distPath));
 })
 
-gulp.task('default', gulp.series('clean',
+gulp.task('development', gulp.series('clean',
     gulp.parallel(
         'fonts',
         'images',
@@ -139,12 +185,25 @@ gulp.task('default', gulp.series('clean',
         'externalStyles',
         'pug',
         'styles',
-        // 'copy:json',
-        // 'js:foundation',
-        // 'js:process',
+        'scripts:serve',
     ),
     gulp.parallel(
         'watch',
         'serve',
     ),
 ));
+
+gulp.task('build', gulp.series('clean',
+    gulp.parallel(
+        'fonts',
+        'images',
+        'svgSprite',
+        'externalStyles',
+        'pug',
+        'styles',
+        'scripts',
+    ),
+    gulp.series('addVersions'),
+));
+
+gulp.task('default', gulp.series('development'));

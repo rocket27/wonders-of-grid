@@ -1,0 +1,27 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true,
+        "node": true
+    },
+    "extends": [
+        "airbnb"
+    ],
+    "parser": "babel-eslint",
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": false,
+            "modules": true
+        },
+        "ecmaVersion": 2020,
+        "sourceType": "module"
+    },
+    "rules": {
+        "indent": ["error", 4],
+        "max-len": ["error", 1000],
+        "import/no-unresolved": 0,
+        "import/no-extraneous-dependencies": 0,
+        "newline-per-chained-call": ["error", { "ignoreChainWithDepth": 1 }],
+        "linebreak-style": "off"
+    }
+}
