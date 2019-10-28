@@ -33,6 +33,11 @@ const setMode = (env = production) => {
 
 gulp.task('clean', callback => del(config.distPath, callback));
 
+gulp.task('files', () => {
+    return gulp.src(`${config.sourcePath}/assets/files/**/*.*`)
+        .pipe(gulp.dest(`${config.distPath}/assets/files`));
+});
+
 gulp.task('fonts', () => {
     return gulp.src(`${config.sourcePath}/assets/fonts/**/*.*`)
         .pipe(gulp.dest(`${config.distPath}/assets/fonts`));
@@ -109,8 +114,11 @@ gulp.task('styles', () => {
 });
 
 gulp.task('pug', () => {
+    const content = require('./source/json/content.json');
+
     return gulp.src(`${config.sourcePath}/templates/pages/*.pug`)
         .pipe(pug({
+            locals: content,
             pretty: true,
         }))
         .on('error', loadPlugin.notify.onError((error) => {
@@ -180,6 +188,7 @@ gulp.task('addVersions', () => {
 gulp.task('development', gulp.series('clean',
     gulp.parallel(
         'fonts',
+        'files',
         'images',
         'svgSprite',
         'externalStyles',
@@ -196,6 +205,7 @@ gulp.task('development', gulp.series('clean',
 gulp.task('build', gulp.series('clean',
     gulp.parallel(
         'fonts',
+        'files',
         'images',
         'svgSprite',
         'externalStyles',
